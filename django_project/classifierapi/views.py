@@ -80,7 +80,7 @@ class LogisticRegression(APIView):
         # print logreg.coef_     
         # #sigmoid( dot([val1, val2], lr.coef_) + lr.intercept_ ) for prediction 
 
-        return HttpResponse( json.dumps(C_array) )
+        return HttpResponse( json.dumps(jobj) )
 
 
 #         {
