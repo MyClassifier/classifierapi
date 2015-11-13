@@ -27,8 +27,8 @@ class LogisticRegression(APIView):
         client_info = request.body
 
         jobj = json.loads(client_info)
-        with open('/data.txt', 'w') as outfile:
-            json.dump(jobj, outfile)
+        # with open('/data.txt', 'w') as outfile:
+        #     json.dump(jobj, outfile)
 
 
         data = jobj['data']
