@@ -25,6 +25,7 @@ class LogisticRegression(APIView):
 
         #retrieve info from request
         client_info = request.body
+        print request.body
 
         jobj = json.loads(client_info)
 
