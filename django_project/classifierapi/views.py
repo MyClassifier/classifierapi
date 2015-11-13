@@ -25,7 +25,8 @@ class LogisticRegression(APIView):
 
         #retrieve info from request
         client_info = request.body
-        print request.body
+        with open('data.txt', 'w') as outfile:
+            json.dump(data, outfile)
 
         jobj = json.loads(client_info)
 
@@ -81,7 +82,7 @@ class LogisticRegression(APIView):
         # print logreg.coef_     
         # #sigmoid( dot([val1, val2], lr.coef_) + lr.intercept_ ) for prediction 
 
-        return HttpResponse( json.dumps(jobj) )
+        return HttpResponse( "Data coming soon!" )
 
 
 #         {
