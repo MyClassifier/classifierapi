@@ -1,0 +1,387 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"logreg",
+				"logreg_p"
+			],
+			[
+				"gra",
+				"graph_transformed_labels"
+			],
+			[
+				"graph_t",
+				"graph_transformed_features"
+			],
+			[
+				"pc_2",
+				"pc_2_pos"
+			],
+			[
+				"HttpRespons",
+				"HttpResponseRedirect"
+			],
+			[
+				"text",
+				"text-align"
+			],
+			[
+				"backgrou",
+				"background-color"
+			],
+			[
+				"sa",
+				"sans-serif"
+			],
+			[
+				"data",
+				"data_array"
+			],
+			[
+				"column",
+				"column_list"
+			],
+			[
+				"fit",
+				"fit_using_pca"
+			],
+			[
+				"y",
+				"y_test"
+			],
+			[
+				"X",
+				"X_train"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "django_project/django_project/settings.py",
+			"settings":
+			{
+				"buffer_size": 2109,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "from rest_framework.views import APIView\nfrom django.http import HttpResponse\nimport numpy as np\nnp.set_printoptions(threshold=np.nan)\nimport sklearn.linear_model as lm\nfrom sklearn import cross_validation, grid_search\nimport json\nimport pickle\nfrom django.shortcuts import render\nfrom django.http import HttpResponse, HttpResponseRedirect\nfrom django.template import RequestContext, loader\nimport matplotlib.pyplot as plt\nimport matplotlib \nimport pylab as pl\nmatplotlib.use('agg')\n\n\ndef doPCA(data, n=2):\n        from sklearn.decomposition import PCA\n        pca = PCA(n_components = n)\n        pca.fit(data)\n        return pca\n\ndef plot(clf, X_test, y_test):\n    #########courtesy of Udacity######################\n    x_min = 0.0; x_max = 1.0\n    y_min = 0.0; y_max = 1.0\n\n    # Plot the decision boundary. For that, we will assign a color to each\n    # point in the mesh [x_min, m_max]x[y_min, y_max].\n    h = .01  # step size in the mesh\n    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))\n    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])\n\n    # Put the result into a color plot\n    Z = Z.reshape(xx.shape)\n    plt.xlim(xx.min(), xx.max())\n    plt.ylim(yy.min(), yy.max())\n\n    #plt.pcolormesh(xx, yy, Z, cmap=pl.cm.seismic)\n\n    # Plot also the test points\n    pc_1 = [X_test[ii][0] for ii in range(0, len(X_test)) if y_test[ii]==0]\n    pc_2 = [X_test[ii][1] for ii in range(0, len(X_test)) if y_test[ii]==0]\n    pc_1_pos = [X_test[ii][0] for ii in range(0, len(X_test)) if y_test[ii]==1]\n    pc_2_pos = [X_test[ii][1] for ii in range(0, len(X_test)) if y_test[ii]==1]\n\n    plt.scatter(pc_1, pc_2, color = \"b\", label=\"neg\")\n    plt.scatter(pc_1_pos, pc_2_pos, color = \"r\", label=\"pos\")\n    plt.legend()\n    plt.xlabel(\"PC1\")\n    plt.ylabel(\"PC2\")\n\n    plt.savefig(\"test.png\")\n           \n\ndef index(request):\n    \n    return HttpResponse(\"hello world\")\n\ndef results(request):\n    template = loader.get_template('results.html')\n    file_path = request.session['file_path']\n    print file_path\n    context = RequestContext(request, {'test': file_path})\n    \n    return HttpResponse(template.render(context))\n\nclass LogisticRegression(APIView):\n\n    def get(self, request):\n      \n        return HttpResponse(\"Stub\")\n\n\n    def post(self, request):\n\n        #retrieve info from request\n        client_info = request.body\n       \n\n        jobj = json.loads(client_info)       \n\n        data = jobj['data']\n        name = jobj['name']\n        request.session['name'] = name\n        category = jobj['class']\n        request.session['class'] = category\n        method = jobj['method']\n        request.session['method'] = method\n        params = json.loads(jobj['params'])\n        C_array = params['C_array']\n        sensor_array = params[\"sensor_array\"] \n        request.session['sensors'] = sensor_array\n        fit_using_pca = params[\"fit_using_pca\"]\n        request.session['fit_using_pca'] = fit_using_pca\n\n        #make sure the number of principle components is at least 2\n        no_pc = params[\"no_pc\"]\n        request.session['no_pc'] = no_pc\n        if no_pc < 2: \n            no_pc = 2                \n       \n        data_array = np.asarray([])\n\n        for column in sensor_array:\n            column_list = np.asarray([d[column] for d in data]).astype(np.float32)\n           \n            if data_array.size > 0:\n                data_array = np.column_stack((data_array, column_list))\n            else:\n                data_array = column_list\n     \n        y = np.array([d['in_category'] for d in data]).astype(np.float32)\n        \n        print \"data_array dtype \" , data_array.dtype\n\n        # split data into training and test sets\n        features_train, features_test, labels_train, labels_test = cross_validation.train_test_split(\n            data_array, y, test_size=0.4, random_state=0)\n\n\n        # get logistic regression classifier\n        lg = lm.LogisticRegression()\n\n        #tune parameters using GridSearchCV\n        parameters = {'C': C_array}\n        request.session['c_params'] = C_array\n\n\n        grdlog = grid_search.GridSearchCV(lg, parameters)\n\n        # train logreg    \n        if(fit_using_pca):\n            pca = doPCA(features_train, no_pc)\n            transformed_features_train = pca.transform(features_train)\n            transformed_labels_train = pca.transform(labels_train)\n            grdlog.fit(transformed_features_train, transformed_labels_train)\n            request.session['explained_variance_ratio', pca.explained_variance_ratio]\n\n        else:            \n            grdlog.fit(features_train, labels_train)\n            lg.set_params(**grdlog.best_params_)\n            lg.fit(features_train, labels_train)\n          \n        \n        request.session['best_parameters'] = grdlog.best_params_\n        print grdlog.best_params_\n        request.session['params'] = lg.coef_.tolist()\n        print lg.coef_\n        request.session['y_intercept'] = lg.intercept_.tolist()\n        print lg.intercept_        \n\n        ### to plot the data with decision boundary\n        #generate decision boundary with top 2 principle components\n        graph_pca = doPCA(features_train, 2)\n        graph_transformed_features = graph_pca.transform(features_train)\n        #labels_pca = doPCA(labels_train, 2)\n        print labels_train.shape\n        #graph_transformed_labels = labels_pca.transform(labels_train)\n        graph_transformed_labels = labels_train\n\n        log_p = lm.LogisticRegression()\n        logreg_p = grid_search.GridSearchCV(log_p, parameters)\n        print graph_transformed_features.shape\n        print graph_transformed_labels\n        logreg_p.fit(graph_transformed_features, graph_transformed_labels)\n        log_p.set_params(**logreg_p.best_params_)\n\n        \n\n        #plot\n        plot(logreg_p, graph_transformed_features, graph_transformed_labels)\n\n       \n\n       \n\n        \n        request.session['file_path'] = \"data.txt\"\n        return HttpResponse( )\n\n\n\n    \n\n\n\n#         {\n#     \"name\": \"h\",\n#     \"class\": \"y\",\n#     \"method\": \"log_reg\",\n#     \"params\": {\n#     \"C_array\": [\n#         0.01,\n#         0.1,\n#         1,\n#         10,\n#         100,\n#         0.01,\n#         0.1,\n#         1,\n#         10,\n#         100\n#     ],\n#     \"sensor_array\": [\n#         \"accelerationX\",\n#         \"accelerationY\",\n#         \"accelerationZ\",\n#         \"gyroX\",\n#         \"gyroY\",\n#         \"gyroZ\",\n#         \"magneticX\",\n#         \"magneticY\",\n#         \"magneticZ\",\n#         \"delta_accelX\",\n#         \"delta_accelY\",\n#         \"delta_accelZ\",\n#         \"delta_gyroX\",\n#         \"delta_gyroY\",\n#         \"delta_gyroZ\",\n#         \"delta_magneticX\",\n#         \"delta_magneticY\",\n#         \"delta_magneticZ\"\n#     ],\n#     \"fit_using_pca\": false,\n#     \"no_pc\": 0\n# }\n#     \"delta\": 0\n# }\n\n",
+			"file": "django_project/classifierapi/views.py",
+			"file_size": 6785,
+			"file_write_time": 130921138260000000,
+			"settings":
+			{
+				"buffer_size": 6779,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "django_project/classifierapi/templates/results.html",
+			"settings":
+			{
+				"buffer_size": 634,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/marksargent/classifierapi",
+		"/Users/marksargent/classifierapi/django_project",
+		"/Users/marksargent/classifierapi/django_project/classifierapi",
+		"/Users/marksargent/classifierapi/django_project/classifierapi/templates",
+		"/Users/marksargent/classifierapi/django_project/django_project"
+	],
+	"file_history":
+	[
+		"/Users/marksargent/classifierapi/django_project/classifierapi/templates/results.html",
+		"/Users/marksargent/classifierapi/django_project/django_project/urls.py",
+		"/Users/marksargent/classifierapi/django_project/classifierapi/models.py",
+		"/Users/marksargent/classifierapi/django_project/classifierapi/urls.py",
+		"/Users/marksargent/classifierapi/django_project/test.png",
+		"/Users/marksargent/classifierapi/django_project/django_project/settings.pye",
+		"/Users/marksargent/myclassifier/classifierapi/static/index.html",
+		"/Users/marksargent/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/Users/marksargent/myclassifier/data.txt",
+		"/Users/marksargent/myclassifier/classifierapi/mlfunctions.py",
+		"/Users/marksargent/django_tutorial/mysite/mysite/views.py",
+		"/Users/marksargent/Desktop/Thesis/cookbook.txt",
+		"/Users/marksargent/myclassifier/classifierapi/migrations/__init__.py",
+		"/Users/marksargent/myclassifier/classifierapi/formatter.py",
+		"/Users/marksargent/myclassifier/mlapi/urls.py",
+		"/Users/marksargent/myclassifier/classifier/views.py",
+		"/Users/marksargent/myclassifier/classifier/formatter.py",
+		"/Users/marksargent/myclassifier/classifierapi/models.py",
+		"/Users/marksargent/myclassifier/mlapi/settings.py",
+		"/Users/marksargent/myclassifier/requirements.txt",
+		"/Users/marksargent/myclassiferapi/requirements.txt",
+		"/Users/marksargent/ScipyRESTApp/db.sqlite3",
+		"/Users/marksargent/hellodjango/hellodjango/Procfile",
+		"/Users/marksargent/hellodjango/hellodjango/__init__.py",
+		"/Users/marksargent/rest_tutorial/tutorial/snippets/serializers.py",
+		"/Users/marksargent/trydjango18/src/trydjango18/urls.py",
+		"/Users/marksargent/trydjango18/src/newsletter/forms.py",
+		"/Users/marksargent/trydjango18/src/newsletter/models.py",
+		"/Users/marksargent/trydjango18/src/templates/home.html",
+		"/Users/marksargent/trydjango18/src/newsletter/admin.py",
+		"/Users/marksargent/trydjango18/src/trydjango18/settings.py",
+		"/Users/marksargent/trydjango18/src/newsletter/views.py",
+		"/Users/marksargent/Library/Application Support/Sublime Text 3/Packages/Default/Default (OSX).sublime-keymap",
+		"/Users/marksargent/Library/Application Support/Sublime Text 3/Packages/User/Default (OSX).sublime-keymap",
+		"/Users/marksargent/trydjango18/src/newsletter/templates/home.html",
+		"/Users/marksargent/Desktop/My Classifier/app.yaml",
+		"/Users/marksargent/Desktop/My Classifier/main.py",
+		"/Users/marksargent/Desktop/My Classifier/index.yaml",
+		"/Users/marksargent/Desktop/hello-udacity/main.py"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"np",
+			"pc2_pos",
+			"bumpy_sig",
+			"grade_sig",
+			"private double",
+			">>>",
+			")"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "django_project/django_project/settings.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2109,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1028,
+								1028
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "django_project/classifierapi/views.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6779,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1789,
+								1789
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 132.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "django_project/classifierapi/templates/results.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 634,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "classifierapi.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 207.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

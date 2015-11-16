@@ -6,6 +6,7 @@ from views import LogisticRegression
 urlpatterns = [
     url(r'^logistic_regression', LogisticRegression.as_view(), 
     	name='logistic_regression'),
+    url(r'^results', views.results, name='results'),
     
 ]
 
