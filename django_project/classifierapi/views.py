@@ -32,8 +32,6 @@ def plot(clf, X_test, y_test):
     xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
 
-    
-
     # Put the result into a color plot
     Z = Z.reshape(xx.shape)
     plt.xlim(xx.min(), xx.max())
@@ -170,64 +168,8 @@ class LogisticRegression(APIView):
         log_p.set_params(**logreg_p.best_params_)
 
         
-
         #plot
-        plot(logreg_p, graph_transformed_features, graph_transformed_labels)
-
-       
-
-       
-
+        #plot(logreg_p, graph_transformed_features, graph_transformed_labels)  
         
         request.session['file_path'] = "data.txt"
-        return HttpResponse( )
-
-
-
-    
-
-
-
-#         {
-#     "name": "h",
-#     "class": "y",
-#     "method": "log_reg",
-#     "params": {
-#     "C_array": [
-#         0.01,
-#         0.1,
-#         1,
-#         10,
-#         100,
-#         0.01,
-#         0.1,
-#         1,
-#         10,
-#         100
-#     ],
-#     "sensor_array": [
-#         "accelerationX",
-#         "accelerationY",
-#         "accelerationZ",
-#         "gyroX",
-#         "gyroY",
-#         "gyroZ",
-#         "magneticX",
-#         "magneticY",
-#         "magneticZ",
-#         "delta_accelX",
-#         "delta_accelY",
-#         "delta_accelZ",
-#         "delta_gyroX",
-#         "delta_gyroY",
-#         "delta_gyroZ",
-#         "delta_magneticX",
-#         "delta_magneticY",
-#         "delta_magneticZ"
-#     ],
-#     "fit_using_pca": false,
-#     "no_pc": 0
-# }
-#     "delta": 0
-# }
-
+        return HttpResponse(np.array_str(lg.coef_) + " " + np.array_str(lg.intercept_))
