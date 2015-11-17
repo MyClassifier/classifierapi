@@ -78,7 +78,6 @@ class LogisticRegression(APIView):
         #retrieve info from request
         client_info = request.body
        
-
         jobj = json.loads(client_info)       
 
         data = jobj['data']
@@ -111,9 +110,7 @@ class LogisticRegression(APIView):
             else:
                 data_array = column_list
      
-        y = np.array([d['in_category'] for d in data]).astype(np.float32)
-        
-        print "data_array dtype " , data_array.dtype
+        y = np.array([d['in_category'] for d in data]).astype(np.float32)       
 
         # split data into training and test sets
         features_train, features_test, labels_train, labels_test = cross_validation.train_test_split(
@@ -145,25 +142,24 @@ class LogisticRegression(APIView):
           
         
         request.session['best_parameters'] = grdlog.best_params_
-        print grdlog.best_params_
+
         request.session['params'] = lg.coef_.tolist()
-        print lg.coef_
+
         request.session['y_intercept'] = lg.intercept_.tolist()
-        print lg.intercept_        
+     
 
         ### to plot the data with decision boundary
         #generate decision boundary with top 2 principle components
         graph_pca = doPCA(features_train, 2)
         graph_transformed_features = graph_pca.transform(features_train)
         #labels_pca = doPCA(labels_train, 2)
-        print labels_train.shape
+
         #graph_transformed_labels = labels_pca.transform(labels_train)
         graph_transformed_labels = labels_train
 
         log_p = lm.LogisticRegression()
         logreg_p = grid_search.GridSearchCV(log_p, parameters)
-        print graph_transformed_features.shape
-        print graph_transformed_labels
+
         logreg_p.fit(graph_transformed_features, graph_transformed_labels)
         log_p.set_params(**logreg_p.best_params_)
 
@@ -173,7 +169,9 @@ class LogisticRegression(APIView):
         
         request.session['file_path'] = "data.txt"
 
-        result = {'name': name, 'category': category, 'method': method,'params': lg.coef_.tolist(), 'intercept': lg.intercept_.tolist()}
+        result = {'name': name, 'category': category, 
+        'method': method,'params': lg.coef_.tolist(), 
+        'intercept': lg.intercept_.tolist(), 'sensors': sensor_array}
       
         return HttpResponse(json.dumps(result))
 
