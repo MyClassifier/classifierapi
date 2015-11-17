@@ -172,4 +172,11 @@ class LogisticRegression(APIView):
         #plot(logreg_p, graph_transformed_features, graph_transformed_labels)  
         
         request.session['file_path'] = "data.txt"
-        return HttpResponse(np.array_str(lg.coef_) + " " + np.array_str(lg.intercept_))
+
+        result = {'name': name, 'category': category, 'method': method,'params': lg.coef_.tolist(), 'intercept': lg.intercept_.tolist()}
+      
+        return HttpResponse(json.dumps(result))
+
+
+
+
