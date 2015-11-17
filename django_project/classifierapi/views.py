@@ -3,7 +3,7 @@ from django.http import HttpResponse
 import numpy as np
 np.set_printoptions(threshold=np.nan)
 import sklearn.linear_model as lm
-from sklearn import cross_validation, grid_search
+from sklearn import cross_validation, grid_search, metrics
 import json
 import pickle
 from django.shortcuts import render
@@ -139,6 +139,10 @@ class LogisticRegression(APIView):
             grdlog.fit(features_train, labels_train)
             lg.set_params(**grdlog.best_params_)
             lg.fit(features_train, labels_train)
+            pred = lg.predict(features_test)
+            accuracy = metrics.accuracy_score(pred, labels_test)
+            request.session['accuracy'] = accuracy
+
           
         
         request.session['best_parameters'] = grdlog.best_params_
@@ -150,18 +154,18 @@ class LogisticRegression(APIView):
 
         ### to plot the data with decision boundary
         #generate decision boundary with top 2 principle components
-        graph_pca = doPCA(features_train, 2)
-        graph_transformed_features = graph_pca.transform(features_train)
-        #labels_pca = doPCA(labels_train, 2)
+        # graph_pca = doPCA(features_train, 2)
+        # graph_transformed_features = graph_pca.transform(features_train)
+        # #labels_pca = doPCA(labels_train, 2)
 
-        #graph_transformed_labels = labels_pca.transform(labels_train)
-        graph_transformed_labels = labels_train
+        # #graph_transformed_labels = labels_pca.transform(labels_train)
+        # graph_transformed_labels = labels_train
 
-        log_p = lm.LogisticRegression()
-        logreg_p = grid_search.GridSearchCV(log_p, parameters)
+        # log_p = lm.LogisticRegression()
+        # logreg_p = grid_search.GridSearchCV(log_p, parameters)
 
-        logreg_p.fit(graph_transformed_features, graph_transformed_labels)
-        log_p.set_params(**logreg_p.best_params_)
+        # logreg_p.fit(graph_transformed_features, graph_transformed_labels)
+        # log_p.set_params(**logreg_p.best_params_)
 
         
         #plot
@@ -171,7 +175,7 @@ class LogisticRegression(APIView):
 
         result = {'name': name, 'category': category, 
         'method': method,'params': lg.coef_.tolist(), 
-        'intercept': lg.intercept_.tolist(), 'sensors': sensor_array}
+        'intercept': lg.intercept_.tolist(), 'sensors': sensor_array, 'accuracy': accuracy}
       
         return HttpResponse(json.dumps(result))
 
