@@ -175,7 +175,7 @@ class LogisticRegression(APIView):
 
         result = {'name': name, 'category': category, 
         'method': method,'params': lg.coef_.tolist(), 
-        'intercept': lg.intercept_.tolist(), 'sensors': sensor_array, 'accuracy': accuracy}
+        'intercept': str(lg.intercept_[0]), 'sensors': sensor_array, 'accuracy': accuracy}
       
         return HttpResponse(json.dumps(result))
 
