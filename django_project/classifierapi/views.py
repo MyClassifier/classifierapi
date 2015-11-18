@@ -174,7 +174,7 @@ class LogisticRegression(APIView):
         request.session['file_path'] = "data.txt"
 
         result = {'name': name, 'category': category, 
-        'method': method,'params': str(lg.coef_[0]), 
+        'method': method,'params': lg.coef_[0].tolist(), 
         'intercept': str(lg.intercept_[0]), 'sensors': sensor_array, 'accuracy': accuracy}
       
         return HttpResponse(json.dumps(result))
