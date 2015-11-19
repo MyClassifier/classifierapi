@@ -93,6 +93,7 @@ class LogisticRegression(APIView):
         request.session['sensors'] = sensor_array
         fit_using_pca = params["fit_using_pca"]
         request.session['fit_using_pca'] = fit_using_pca
+        delta = jobj['delta']
 
         #make sure the number of principle components is at least 2
         no_pc = params["no_pc"]
@@ -175,7 +176,8 @@ class LogisticRegression(APIView):
 
         result = {'name': name, 'category': category, 
         'method': method,'params': lg.coef_[0].tolist(), 
-        'intercept': str(lg.intercept_[0]), 'sensors': sensor_array, 'accuracy': accuracy}
+        'intercept': str(lg.intercept_[0]), 'sensors': sensor_array, 'delta': delta,
+        'accuracy': accuracy}
       
         return HttpResponse(json.dumps(result))
 
