@@ -111,7 +111,8 @@ class LogisticRegression(APIView):
             else:
                 data_array = column_list
      
-        y = np.array([d['in_category'] for d in data]).astype(np.float32)       
+        y = np.array([d['in_category'] for d in data]).astype(np.float32)      
+ 
 
         # split data into training and test sets
         features_train, features_test, labels_train, labels_test = cross_validation.train_test_split(
