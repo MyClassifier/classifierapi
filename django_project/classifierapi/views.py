@@ -93,7 +93,7 @@ class LogisticRegression(APIView):
         request.session['sensors'] = sensor_array
         fit_using_pca = params["fit_using_pca"]
         request.session['fit_using_pca'] = fit_using_pca
-        delta = jobj['delta']
+       
 
         #make sure the number of principle components is at least 2
         no_pc = params["no_pc"]
