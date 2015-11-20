@@ -41,7 +41,17 @@
 	</header>
 	<div id="container">
 		<main>
-		<h2>{{test}}</h2>
+		<h2>Predictor Name: {{name}}</h2>
+		<h2>Class: {{class}}</h2>
+		<h2>Method: {{method}}</h2>
+		<h2>Sensors: {{sensors}}</h2>
+
+
+
+        sensor_array = params["sensor_array"] 
+        request.session['sensors'] = sensor_array
+        fit_using_pca = params["fit_using_pca"]
+        request.session['fit_using_pca'] = fit_using_pca
 			
 		</main>
 	</div>
