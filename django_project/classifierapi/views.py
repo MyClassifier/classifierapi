@@ -59,12 +59,8 @@ def index(request):
     return HttpResponse("hello world")
 
 def results(request):
-    template = loader.get_template('results.html')
-    file_path = request.session['file_path']
-    print file_path
-    context = RequestContext(request, {'test': file_path})
     
-    return HttpResponse(template.render(context))
+    return render(request, 'results.html', request.session)
 
 class LogisticRegression(APIView):
 
@@ -89,6 +85,7 @@ class LogisticRegression(APIView):
         request.session['method'] = method
         params = json.loads(jobj['params'])
         C_array = params['C_array']
+        request.session['C_array'] = C_array
         sensor_array = params["sensor_array"] 
         request.session['sensors'] = sensor_array
         fit_using_pca = params["fit_using_pca"]
@@ -142,16 +139,25 @@ class LogisticRegression(APIView):
             lg.set_params(**grdlog.best_params_)
             lg.fit(features_train, labels_train)
             pred = lg.predict(features_test)
-            accuracy = metrics.accuracy_score(pred, labels_test)
+            accuracy = metrics.accuracy_score(labels_test, pred)
             request.session['accuracy'] = accuracy
-
+            confusion_matrix = metrics.confusion_matrix(labels_test, pred)
+            request.session['confusion_matrix'] = confusion_matrix.tolist()
+            f1 = metrics.f1_score(labels_test, pred)
+            request.session['f1'] = f1
+            precision = metrics.precision_score(labels_test, pred)
+            request.session['precision'] = precision
+            recall = metrics.recall_score(labels_test, pred)
+            request.session['recall'] = recall
           
         
-        request.session['best_parameters'] = grdlog.best_params_
+        request.session['best_parameters'] = grdlog.best_params_['C']
 
-        request.session['params'] = lg.coef_.tolist()
 
-        request.session['y_intercept'] = lg.intercept_.tolist()
+        parameters = lg.coef_.tolist()[0]
+        sensor_params = zip(sensor_array, parameters)
+        request.session["sensor_params"] = sensor_params
+        request.session['y_intercept'] = lg.intercept_.tolist()[0]
      
 
         ### to plot the data with decision boundary
@@ -180,7 +186,7 @@ class LogisticRegression(APIView):
         'intercept': str(lg.intercept_[0]), 'sensors': sensor_array, 
         'accuracy': accuracy}
       
-        return HttpResponse(json.dumps(result))
+        return HttpResponseRedirect('/classify/results')
 
 
 

@@ -9,26 +9,77 @@
 		}
 		html{
 			background:#333333;
+			color:#aaa;
 		}
-		header, footer {
+		header{
 			width:100%;
-			height:100px;
-			color:white;
+			padding:5%;
 			background-color: #963030;
 		}
-		header h1, footer{
-			text-align: center;
+		h1{
+			font-size:5vw;
 		}
+
+		h2{
+			font-size:4vw;
+		}
+
 		main {
-			height:600px;
+			height:95%;
 			width:100%;
+			padding-bottom: 5%;
 		}
 
 		#container{
-			width:70%;
+			width:100%;
 			height:100%;
 			margin: 0 auto;
-			background-color: #444444;
+			padding:5%;
+			background-color: #444;
+
+		}
+		ul{
+
+		}
+
+		li {
+			list-style-type: none;
+			display:inline;
+		}
+	
+		#params, aside{
+			background-color: #333;
+			margin-bottom:2%;
+			margin-right:10%;
+			padding:3%;
+
+		}
+
+		span, li{
+			color:#888;
+		}
+		table, tr, td, th{
+			border-collapse: collapse;
+			border-color: #888;
+		}
+		td, th{
+			padding:1%;
+		}
+		#sensor_param td:first-child, #sensor_param  th:first-child{
+			width:50%;
+			background-color: #222;
+		}
+		#sensor_param td:nth-child(2), #sensor_param  th:nth-child(2){
+			background-color: #222;			
+		}
+
+		table{
+			background-color: #222;		
+		}
+		
+		#confusion{
+			margin-top:10dp;
+			width:80%;
 		}
 
 	</style>
@@ -36,27 +87,67 @@
 </head>
 <body>
 	<header>
-		<h1>Classification Results</h1>
-
+		
+			<div id="values">
+			<h1>Classification Results</h1>
+				<h2>Predictor Name: <span>{{name}}</span></h2>
+				<h2>Class: <span>{{class}}</span></h2> 
+				<h2>Method: <span>{{method}}</span></h2> 
+		
+			</div>
 	</header>
+
 	<div id="container">
 		<main>
-		<h2>Predictor Name: {{name}}</h2>
-		<h2>Class: {{class}}</h2>
-		<h2>Method: {{method}}</h2>
-		<h2>Sensors: {{sensors}}</h2>
-
-
-
-        sensor_array = params["sensor_array"] 
-        request.session['sensors'] = sensor_array
-        fit_using_pca = params["fit_using_pca"]
-        request.session['fit_using_pca'] = fit_using_pca
+			<div id="params">
+				<table id="sensor_param" border="1">
+				<tr>
+				<th>Sensor</th><th>Trained Weight</th>
+				</tr>
+					
+					{% for s, w in sensor_params %}
+					<tr>
+					<td>{{s}}</td><td>{{w}}</td>
+					</tr>
+					{% endfor %}
+				
+				</table>		
+				<h3>Intercept: <span>{{y_intercept}}</span></h3> 
+			</div>
 			
+			<aside>
+			<h3>Cross Validation/Parameter Tuning</h3>				
+				<h3>C values tried:</h3>
+				<ul>
+					{% for c in C_array %}
+					<li>{{c}}</li>
+					{% endfor %}									
+				</ul>
+				<h3>Best C (Grid Search): <span>{{best_parameters}}</span></h3> 
+			</aside>	
+
+			<aside>
+			<h3>Accuracy on test set: <span>{{accuracy}}</span></h3> 
+
+			
+			<h3>Confusion Matrix: </h3> 
+			<table id="confusion" border="1">
+			<tr><th></th><th colspan="3">Prediction Outcome</th></tr>
+			<tr><th rowspan="3">Actual Value</th><th></th><th>Positive</th><th>Negative</th></tr>
+			<tr><td>Positive</td><td>{{confusion_matrix.0.0}}</td><td>{{confusion_matrix.0.1}}</td></tr>
+			<tr><td>Negative</td><td>{{confusion_matrix.1.0}}</td><td>{{confusion_matrix.1.1}}</td></tr>
+
+			</table>
+
+			<h3>Precision: <span>{{precision}}</span></h3> 
+			<h3>Recall: <span>{{recall}}</span></h3> 
+			<h3>F1: <span>{{f1}}</span></h3> 
+		
+			</aside>	
+
 		</main>
+		
 	</div>
-	<footer>
-		&copy; Mark Sargent 2015
-	</footer>
+
 </body>
 </html>
