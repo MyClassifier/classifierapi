@@ -8,10 +8,11 @@ import json
 import pickle
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from django.template import RequestContext, loader
+from django.template import RequestContext, Context, loader, Template
 import matplotlib.pyplot as plt
 import matplotlib 
 import pylab as pl
+
 matplotlib.use('agg')
 
 
@@ -58,8 +59,7 @@ def index(request):
     
     return HttpResponse("hello world")
 
-def results(request):
-    
+def results(request): 
     return render(request, 'results.html', request.session)
 
 class LogisticRegression(APIView):
@@ -70,7 +70,6 @@ class LogisticRegression(APIView):
 
 
     def post(self, request):
-
         #retrieve info from request
         client_info = request.body
        
@@ -88,16 +87,7 @@ class LogisticRegression(APIView):
         request.session['C_array'] = C_array
         sensor_array = params["sensor_array"] 
         request.session['sensors'] = sensor_array
-        fit_using_pca = params["fit_using_pca"]
-        request.session['fit_using_pca'] = fit_using_pca
-       
-
-        #make sure the number of principle components is at least 2
-        no_pc = params["no_pc"]
-        request.session['no_pc'] = no_pc
-        if no_pc < 2: 
-            no_pc = 2                
-       
+                      
         data_array = np.asarray([])
 
         for column in sensor_array:
@@ -115,7 +105,6 @@ class LogisticRegression(APIView):
         features_train, features_test, labels_train, labels_test = cross_validation.train_test_split(
             data_array, y, test_size=0.4, random_state=0)
 
-
         # get logistic regression classifier
         lg = lm.LogisticRegression()
 
@@ -123,70 +112,44 @@ class LogisticRegression(APIView):
         parameters = {'C': C_array}
         request.session['c_params'] = C_array
 
-
         grdlog = grid_search.GridSearchCV(lg, parameters)
 
-        # train logreg    
-        if(fit_using_pca):
-            pca = doPCA(features_train, no_pc)
-            transformed_features_train = pca.transform(features_train)
-            transformed_labels_train = pca.transform(labels_train)
-            grdlog.fit(transformed_features_train, transformed_labels_train)
-            request.session['explained_variance_ratio', pca.explained_variance_ratio]
-
-        else:            
-            grdlog.fit(features_train, labels_train)
-            lg.set_params(**grdlog.best_params_)
-            lg.fit(features_train, labels_train)
-            pred = lg.predict(features_test)
-            accuracy = metrics.accuracy_score(labels_test, pred)
-            request.session['accuracy'] = accuracy
-            confusion_matrix = metrics.confusion_matrix(labels_test, pred)
-            request.session['confusion_matrix'] = confusion_matrix.tolist()
-            f1 = metrics.f1_score(labels_test, pred)
-            request.session['f1'] = f1
-            precision = metrics.precision_score(labels_test, pred)
-            request.session['precision'] = precision
-            recall = metrics.recall_score(labels_test, pred)
-            request.session['recall'] = recall
-          
-        
+        # train              
+        grdlog.fit(features_train, labels_train)
+        lg.set_params(**grdlog.best_params_)
+        lg.fit(features_train, labels_train)
+        pred = lg.predict(features_test)
+        accuracy = metrics.accuracy_score(labels_test, pred)
+        request.session['accuracy'] = accuracy
+        confusion_matrix = metrics.confusion_matrix(labels_test, pred)
+        request.session['confusion_matrix'] = confusion_matrix.tolist()
+        f1 = metrics.f1_score(labels_test, pred)
+        request.session['f1'] = f1
+        precision = metrics.precision_score(labels_test, pred)
+        request.session['precision'] = precision
+        recall = metrics.recall_score(labels_test, pred)
+        request.session['recall'] = recall               
         request.session['best_parameters'] = grdlog.best_params_['C']
-
 
         parameters = lg.coef_.tolist()[0]
         sensor_params = zip(sensor_array, parameters)
         request.session["sensor_params"] = sensor_params
         request.session['y_intercept'] = lg.intercept_.tolist()[0]
-     
+             
+        result = {"name": name, "category": category, 
+        "method": method,"params": lg.coef_[0].tolist(), 
+        "intercept": str(lg.intercept_[0]), "sensors": sensor_array, 
+        "accuracy": accuracy}
 
-        ### to plot the data with decision boundary
-        #generate decision boundary with top 2 principle components
-        # graph_pca = doPCA(features_train, 2)
-        # graph_transformed_features = graph_pca.transform(features_train)
-        # #labels_pca = doPCA(labels_train, 2)
+        request.session["results"] = str(result)
 
-        # #graph_transformed_labels = labels_pca.transform(labels_train)
-        # graph_transformed_labels = labels_train
+        html = str(render(request, "results.html", request.session))
+    
+        response = {"html": html, "results": result}
+        json_response = json.dumps(response)
 
-        # log_p = lm.LogisticRegression()
-        # logreg_p = grid_search.GridSearchCV(log_p, parameters)
+        return HttpResponse(json_response)
 
-        # logreg_p.fit(graph_transformed_features, graph_transformed_labels)
-        # log_p.set_params(**logreg_p.best_params_)
-
-        
-        #plot
-        #plot(logreg_p, graph_transformed_features, graph_transformed_labels)  
-        
-        request.session['file_path'] = "data.txt"
-
-        result = {'name': name, 'category': category, 
-        'method': method,'params': lg.coef_[0].tolist(), 
-        'intercept': str(lg.intercept_[0]), 'sensors': sensor_array, 
-        'accuracy': accuracy}
-      
-        return HttpResponseRedirect('/classify/results')
 
 
 
