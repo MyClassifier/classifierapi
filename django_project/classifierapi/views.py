@@ -12,6 +12,7 @@ from django.template import RequestContext, Context, loader, Template
 import matplotlib.pyplot as plt
 import matplotlib 
 import pylab as pl
+import re
 
 matplotlib.use('agg')
 
@@ -71,12 +72,14 @@ class LogisticRegression(APIView):
 
     def post(self, request):
         #retrieve info from request
+        print "request received"
         client_info = request.body
-       
-        jobj = json.loads(client_info)       
+        print "loading data"
+        jobj = json.loads(client_info)      
 
         data = jobj['data']
         name = jobj['name']
+
         request.session['name'] = name
         category = jobj['class']
         request.session['class'] = category
@@ -98,30 +101,42 @@ class LogisticRegression(APIView):
             else:
                 data_array = column_list
      
-        y = np.array([d['in_category'] for d in data]).astype(np.float32)      
- 
+        y = np.array([d['in_category'] for d in data]).astype(np.float32)
 
+        print y      
+        
+        print "splitting data into training and test sets"
         # split data into training and test sets
         features_train, features_test, labels_train, labels_test = cross_validation.train_test_split(
             data_array, y, test_size=0.4, random_state=0)
 
         # get logistic regression classifier
+        print "creating classifier"
         lg = lm.LogisticRegression()
 
         #tune parameters using GridSearchCV
+        print "tuning parameters for regression"
         parameters = {'C': C_array}
+        print "parameters: ", parameters
         request.session['c_params'] = C_array
 
         grdlog = grid_search.GridSearchCV(lg, parameters)
-
-        # train              
+        
+        
+        # train 
+        print "training data"             
         grdlog.fit(features_train, labels_train)
         lg.set_params(**grdlog.best_params_)
+        print "fitting data"
         lg.fit(features_train, labels_train)
+        print "generating predictions using test set"
         pred = lg.predict(features_test)
+        print "getting metrics for predicions"
         accuracy = metrics.accuracy_score(labels_test, pred)
+        print "accuracy: ", accuracy
         request.session['accuracy'] = accuracy
         confusion_matrix = metrics.confusion_matrix(labels_test, pred)
+        print "confusion matrix: ", confusion_matrix
         request.session['confusion_matrix'] = confusion_matrix.tolist()
         f1 = metrics.f1_score(labels_test, pred)
         request.session['f1'] = f1
@@ -129,13 +144,15 @@ class LogisticRegression(APIView):
         request.session['precision'] = precision
         recall = metrics.recall_score(labels_test, pred)
         request.session['recall'] = recall               
-        request.session['best_parameters'] = grdlog.best_params_['C']
-
+        
+        print "getting parameters"
         parameters = lg.coef_.tolist()[0]
         sensor_params = zip(sensor_array, parameters)
         request.session["sensor_params"] = sensor_params
         request.session['y_intercept'] = lg.intercept_.tolist()[0]
-             
+        request.session['best_parameters'] = grdlog.best_params_['C']
+        
+        print "sending result"  
         result = {"name": name, "category": category, 
         "method": method,"params": lg.coef_[0].tolist(), 
         "intercept": str(lg.intercept_[0]), "sensors": sensor_array, 
@@ -143,9 +160,8 @@ class LogisticRegression(APIView):
 
         request.session["results"] = str(result)
 
-        html = str(render(request, "results.html", request.session))
-    
-        response = {"html": html, "results": result}
+        html = str(render(request, "results.html", request.session))    
+        response = {"html": html, "results": html}
         json_response = json.dumps(response)
 
         return HttpResponse(json_response)
