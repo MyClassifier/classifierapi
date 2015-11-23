@@ -101,9 +101,7 @@ class LogisticRegression(APIView):
             else:
                 data_array = column_list
      
-        y = np.array([d['in_category'] for d in data]).astype(np.float32)
-
-        print y      
+        y = np.array([d['in_category'] for d in data]).astype(np.float32) 
         
         print "splitting data into training and test sets"
         # split data into training and test sets
@@ -161,7 +159,7 @@ class LogisticRegression(APIView):
         request.session["results"] = str(result)
 
         html = str(render(request, "results.html", request.session))    
-        response = {"html": html, "results": html}
+        response = {"html": html, "results": result}
         json_response = json.dumps(response)
 
         return HttpResponse(json_response)
