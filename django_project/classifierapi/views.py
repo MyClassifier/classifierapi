@@ -16,48 +16,7 @@ import re
 
 matplotlib.use('agg')
 
-
-def doPCA(data, n=2):
-        from sklearn.decomposition import PCA
-        pca = PCA(n_components = n)
-        pca.fit(data)
-        return pca
-
-def plot(clf, X_test, y_test):
-    #########courtesy of Udacity######################
-    x_min = 0.0; x_max = 1.0
-    y_min = 0.0; y_max = 1.0
-
-    # Plot the decision boundary. For that, we will assign a color to each
-    # point in the mesh [x_min, m_max]x[y_min, y_max].
-    h = .01  # step size in the mesh
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
-
-    # Put the result into a color plot
-    Z = Z.reshape(xx.shape)
-    plt.xlim(xx.min(), xx.max())
-    plt.ylim(yy.min(), yy.max())
-
-    #plt.pcolormesh(xx, yy, Z, cmap=pl.cm.seismic)
-
-    # Plot also the test points
-    pc_1 = [X_test[ii][0] for ii in range(0, len(X_test)) if y_test[ii]==0]
-    pc_2 = [X_test[ii][1] for ii in range(0, len(X_test)) if y_test[ii]==0]
-    pc_1_pos = [X_test[ii][0] for ii in range(0, len(X_test)) if y_test[ii]==1]
-    pc_2_pos = [X_test[ii][1] for ii in range(0, len(X_test)) if y_test[ii]==1]
-
-    plt.scatter(pc_1, pc_2, color = "b", label="neg")
-    plt.scatter(pc_1_pos, pc_2_pos, color = "r", label="pos")
-    plt.legend()
-    plt.xlabel("PC1")
-    plt.ylabel("PC2")
-
-    plt.savefig("test.png")
-           
-
 def index(request):
-    
     return HttpResponse("hello world")
 
 def results(request): 
@@ -130,17 +89,17 @@ class LogisticRegression(APIView):
         print "generating predictions using test set"
         pred = lg.predict(features_test)
         print "getting metrics for predicions"
-        accuracy = metrics.accuracy_score(labels_test, pred)
+        accuracy = metrics.accuracy_score(pred, labels_test)
         print "accuracy: ", accuracy
         request.session['accuracy'] = accuracy
-        confusion_matrix = metrics.confusion_matrix(labels_test, pred)
+        confusion_matrix = metrics.confusion_matrix(lpred, labels_test)
         print "confusion matrix: ", confusion_matrix
         request.session['confusion_matrix'] = confusion_matrix.tolist()
-        f1 = metrics.f1_score(labels_test, pred)
+        f1 = metrics.f1_score(pred, pred)
         request.session['f1'] = f1
-        precision = metrics.precision_score(labels_test, pred)
+        precision = metrics.precision_score(pred, labels_test)
         request.session['precision'] = precision
-        recall = metrics.recall_score(labels_test, pred)
+        recall = metrics.recall_score(pred, labels_test)
         request.session['recall'] = recall               
         
         print "getting parameters"

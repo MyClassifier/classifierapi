@@ -1,0 +1,290 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"j",
+				"json_response"
+			],
+			[
+				"con",
+				"confusion_matrix"
+			],
+			[
+				"sensor",
+				"sensor_array"
+			],
+			[
+				"padding",
+				"padding-bottom"
+			],
+			[
+				"logreg",
+				"logreg_p"
+			],
+			[
+				"gra",
+				"graph_transformed_labels"
+			],
+			[
+				"graph_t",
+				"graph_transformed_features"
+			],
+			[
+				"pc_2",
+				"pc_2_pos"
+			],
+			[
+				"HttpRespons",
+				"HttpResponseRedirect"
+			],
+			[
+				"text",
+				"text-align"
+			],
+			[
+				"backgrou",
+				"background-color"
+			],
+			[
+				"sa",
+				"sans-serif"
+			],
+			[
+				"data",
+				"data_array"
+			],
+			[
+				"column",
+				"column_list"
+			],
+			[
+				"fit",
+				"fit_using_pca"
+			],
+			[
+				"y",
+				"y_test"
+			],
+			[
+				"X",
+				"X_train"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/marksargent/ud120-projects"
+	],
+	"file_history":
+	[
+		"/Users/marksargent/classifierapi/django_project/django_project/settings.py",
+		"/Users/marksargent/classifierapi/django_project/classifierapi/urls.py",
+		"/Users/marksargent/classifierapi/django_project/classifierapi/templates/results.html",
+		"/Users/marksargent/classifierapi/django_project/django_project/urls.py",
+		"/Users/marksargent/classifierapi/django_project/classifierapi/models.py",
+		"/Users/marksargent/classifierapi/django_project/test.png",
+		"/Users/marksargent/classifierapi/django_project/django_project/settings.pye",
+		"/Users/marksargent/myclassifier/classifierapi/static/index.html",
+		"/Users/marksargent/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/Users/marksargent/myclassifier/data.txt",
+		"/Users/marksargent/myclassifier/classifierapi/mlfunctions.py",
+		"/Users/marksargent/django_tutorial/mysite/mysite/views.py",
+		"/Users/marksargent/Desktop/Thesis/cookbook.txt",
+		"/Users/marksargent/myclassifier/classifierapi/migrations/__init__.py",
+		"/Users/marksargent/myclassifier/classifierapi/formatter.py",
+		"/Users/marksargent/myclassifier/mlapi/urls.py",
+		"/Users/marksargent/myclassifier/classifier/views.py",
+		"/Users/marksargent/myclassifier/classifier/formatter.py",
+		"/Users/marksargent/myclassifier/classifierapi/models.py",
+		"/Users/marksargent/myclassifier/mlapi/settings.py",
+		"/Users/marksargent/myclassifier/requirements.txt",
+		"/Users/marksargent/myclassiferapi/requirements.txt",
+		"/Users/marksargent/ScipyRESTApp/db.sqlite3",
+		"/Users/marksargent/hellodjango/hellodjango/Procfile",
+		"/Users/marksargent/hellodjango/hellodjango/__init__.py",
+		"/Users/marksargent/rest_tutorial/tutorial/snippets/serializers.py",
+		"/Users/marksargent/trydjango18/src/trydjango18/urls.py",
+		"/Users/marksargent/trydjango18/src/newsletter/forms.py",
+		"/Users/marksargent/trydjango18/src/newsletter/models.py",
+		"/Users/marksargent/trydjango18/src/templates/home.html",
+		"/Users/marksargent/trydjango18/src/newsletter/admin.py",
+		"/Users/marksargent/trydjango18/src/trydjango18/settings.py",
+		"/Users/marksargent/trydjango18/src/newsletter/views.py",
+		"/Users/marksargent/Library/Application Support/Sublime Text 3/Packages/Default/Default (OSX).sublime-keymap",
+		"/Users/marksargent/Library/Application Support/Sublime Text 3/Packages/User/Default (OSX).sublime-keymap",
+		"/Users/marksargent/trydjango18/src/newsletter/templates/home.html",
+		"/Users/marksargent/Desktop/My Classifier/app.yaml",
+		"/Users/marksargent/Desktop/My Classifier/main.py",
+		"/Users/marksargent/Desktop/My Classifier/index.yaml",
+		"/Users/marksargent/Desktop/hello-udacity/main.py"
+	],
+	"find":
+	{
+		"height": 25.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"));",
+			"map.",
+			"cursor.getColumnIndex(",
+			")));",
+			")),",
+			"cursor.getColumnName(cursor.getColumnIndex(",
+			"delta ",
+			"np",
+			"pc2_pos",
+			"bumpy_sig",
+			"grade_sig",
+			"private double",
+			">>>",
+			")"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "ud.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 207.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
