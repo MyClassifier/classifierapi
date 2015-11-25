@@ -93,6 +93,10 @@ class LogisticRegression(APIView):
         print "accuracy: ", accuracy
         request.session['accuracy'] = accuracy
         confusion_matrix = metrics.confusion_matrix(labels_test, pred)
+
+        confusion_matrix = metrics.confusion_matrix([1, 1, 1, 1, 0, 1], 
+
+                                                    [1, 1, 0, 1, 1, 0])
         print "confusion matrix: ", confusion_matrix
         request.session['confusion_matrix'] = confusion_matrix.tolist()
         f1 = metrics.f1_score(labels_test, pred)
