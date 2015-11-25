@@ -89,17 +89,17 @@ class LogisticRegression(APIView):
         print "generating predictions using test set"
         pred = lg.predict(features_test)
         print "getting metrics for predicions"
-        accuracy = metrics.accuracy_score(pred, labels_test)
+        accuracy = metrics.accuracy_score(labels_test, pred)
         print "accuracy: ", accuracy
         request.session['accuracy'] = accuracy
-        confusion_matrix = metrics.confusion_matrix(pred, labels_test)
+        confusion_matrix = metrics.confusion_matrix(labels_test, pred)
         print "confusion matrix: ", confusion_matrix
         request.session['confusion_matrix'] = confusion_matrix.tolist()
-        f1 = metrics.f1_score(pred, pred)
+        f1 = metrics.f1_score(labels_test, pred)
         request.session['f1'] = f1
-        precision = metrics.precision_score(pred, labels_test)
+        precision = metrics.precision_score(labels_test, pred)
         request.session['precision'] = precision
-        recall = metrics.recall_score(pred, labels_test)
+        recall = metrics.recall_score(labels_test, pred)
         request.session['recall'] = recall               
         
         print "getting parameters"
