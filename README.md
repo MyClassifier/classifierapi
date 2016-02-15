@@ -3,6 +3,11 @@ This is the second component in MyClassifier: It's a Django RESTful service that
 
 The api currently lives on Digital Ocean (email me to for more information).
 
+This is a working prototype: refactoring in process. 
+
+More documentation coming soon!
+
+
 
 References/Acknowledgements
 Many thanks to Udacity's Machine Learning Course (https://www.udacity.com/course/intro-to-machine-learning--ud120) with Sabastian Thrun and Katie Malone, some small pieces of code come from this course, as well as the general approach for using Scikit-learn.  
